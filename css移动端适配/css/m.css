@@ -1,0 +1,56 @@
+@media (max-width: 1199px) and (min-width: 769px) {
+  .main {
+    width: 100%;
+  }
+
+  .menu {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    text-align: center;
+  }
+
+  .header .logo {
+    display: inline-block;
+    float: none;
+    margin: 0;
+  }
+
+  .header .nav {
+    display: none;
+    position: absolute;
+    top: 4rem;
+    left: 0;
+    width: 100%;
+    height: 12rem;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, .5);
+  }
+
+  .header .nav-item {
+    float: none;
+    width: 100%;
+    height: 4rem;
+  }
+
+  .header .nav-btn {
+    display: block;
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  .menu {
+    width: 100%;
+    margin: 0;
+  }
+
+  .menu-item {
+    width: 50%;
+  }
+}
