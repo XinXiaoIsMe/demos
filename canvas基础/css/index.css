@@ -1,0 +1,20 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background-color: orange;
+}
+
+.wrap {
+  padding: 20px;
+}
+
+.inner {
+  width: 640px;
+  height: 400px;
+  background: url(../img/flower.webp) no-repeat center/contain;
+  cursor: pointer;
+}
