@@ -1,0 +1,29 @@
+.x-alert {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 350px;
+  min-height: 100px;
+  border-radius: 10px;
+  box-shadow: 1px 1px 2px #000;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+.x-alert__tips {
+  padding: 20px;
+}
+
+.x-alert__btns {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px 20px 20px;
+}
+
+.x-alert__confirm {
+  margin-right: 10px;
+}
