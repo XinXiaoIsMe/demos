@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常见JS API源码</title>
+</head>
+<body>
+  <input type="text" />
+
+  <script src="./throttle.js"></script>
+  <script>
+    const oInput = document.querySelector('input')
+    oInput.addEventListener('input', throttle(test, 1000))
+
+    function test () {
+      console.log('input')
+    }
+  </script>
+</body>
+</html>
