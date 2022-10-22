@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue DOM Diff</title>
+</head>
+<body>
+  <button id="start-diff">开始Diff</button>
+  <h1>用于Diff：</h1>
+  <div id="diff"></div>
+  <h1>不做Diff直接渲染最终的VDOM</h1>
+  <div id="app"></div>
+  <!-- <script type="module" src="./diff/index.js"></script> -->
+  <script src="./diff_v2/index.js" type="module"></script>
+
+  <!-- <script>
+    const num = 100
+
+    function numToChinese (num) {
+      if (typeof num !== 'number' || isNaN(num)) throw new TypeError('please pass a valid number.')
+
+      const map = {
+        1: ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'],
+        2: '十',
+        3: '百',
+        4: '千',
+        5: '万',
+        9: '亿',
+        17: '兆'
+      }
+      const _num = Math.abs(num)
+      const numToStr = String(_num)
+      const signal = (num < 0) ? '负' : ''
+      let ret = ''
+      let hasZero = false
+
+      for (let i = numToStr.length; i >= 1; i --) {
+
+      }
+
+      return signal + ret
+    }
+
+    console.log(numToChinese(100000000))
+    console.log('-----------------分割线-----------------')
+  </script> -->
+</body>
+</html>
