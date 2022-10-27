@@ -1,0 +1,5 @@
+%%c: pink;
+
+#app {
+  color: %%c;
+}
