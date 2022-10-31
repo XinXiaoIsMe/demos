@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Page</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      text-align: center;
+    }
+
+    th {
+      padding: 5px 10px;
+      background-color: #000;
+      color: #fff;
+    }
+
+    td {
+      padding: 5px 10px;
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Page</h1>
+  <nav>
+    <a href="/">Index Page</a>
+    <a href="/product">Product Page</a>
+  </nav>
+  <h2>User List</h2>
+  <table class="user-list">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Gender</th>
+      </tr>
+    </thead>
+    <tbody class="user-list__body"></tbody>
+  </table>
+
+  <script type="text/tpl" id="user-tpl">
+    <tr>
+      <td class="user-name">{{ name }}</td>
+      <td class="user-gender">{{ gender }}</td>
+    </tr>
+  </script>
+
+  <script type="module">
+    import { renderTpl } from './js/utils.js'
+
+    ;(async function (doc) {
+      const oList = doc.getElementsByClassName('user-list__body')[0]
+      const tpl = doc.getElementById('user-tpl').textContent
+      const data = await getUser()
+
+      renderList()
+
+      function renderList () {
+        let oListItem = ''
+        data.forEach(user => {
+          oListItem += renderTpl(tpl, user)
+        })
+        oList.innerHTML = oListItem
+      }
+      
+      async function getUser () {
+        return fetch('http://localhost:3000/user/getUser').then(res => res.json())
+      }
+    })(document)
+  </script>
+</body>
+</html>

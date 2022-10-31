@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Page</title>
+</head>
+<body>
+  <h1>Product Page</h1>
+  <nav>
+    <a href="/">Index Page</a>
+    <a href="/user">User Page</a>
+  </nav>
+  <h2>Add Product</h2>
+  <div>
+    Name: <input type="text" placeholder="please type product name." class="product-name-input" />
+    Price: <input type="text" placeholder="please type product price." class="product-price-input" />
+    <button class="submit-btn">Submit</button>
+  </div>
+  <h2>Product Detail</h2>
+  <div class="product-list">
+    <div class="product-list-head">
+      <span class="product-name">Name</span>
+      <span class="product-price">Price</span>
+      <span class="product-operation">Operation</span>
+    </div>
+    <div class="product-list-body"></div>
+  </div>
+
+  <script type="text/tpl" id="product-tpl">
+    <div class="product-list-item">
+      <span class="product-name">{{ name }}</span>
+      <span class="product-price">{{ price }}</span>
+      <button class="product-operation" data-id="{{ id }}" data-role="DELETE">DELETE</button>
+    </div>
+  </script>
+
+  <script type="module">
+    import { renderTpl } from './js/utils.js'
+
+    ;(async function (doc) {
+      const oProductListBody = doc.getElementsByClassName('product-list-body')[0]
+      const oProductNameInput = doc.getElementsByClassName('product-name-input')[0]
+      const oProductPriceInput = doc.getElementsByClassName('product-price-input')[0]
+      const oSubmitBtn = doc.getElementsByClassName('submit-btn')[0]
+      const tpl = doc.getElementById('product-tpl').textContent
+
+      renderList()
+      oSubmitBtn.addEventListener('click', addProduct)
+      oProductListBody.addEventListener('click', removeProduct)
+
+      async function renderList () {
+        let list = ''
+        const data = await getProduct()
+        data.forEach(productObj => {
+          list += renderTpl(tpl, productObj)
+        })
+        oProductListBody.innerHTML = list || '暂无数据'
+      }
+
+      async function getProduct () {
+        return fetch('http://localhost:3000/product/getProduct').then(res => res.json())
+      }
+
+      async function addProduct () {
+        const name = oProductNameInput.value.trim()
+        const price = oProductPriceInput.value.trim()
+
+        oProductNameInput.value = oProductPriceInput.value = ''
+
+        const {
+          status,
+          code,
+          msg
+        } = await fetch('http://localhost:3000/product/addProduct', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json' // 注意此处需要设置为 application/json，否则后端拿不到数据
+          },
+          body: JSON.stringify({ name, price })
+        }).then(res => res.json())
+
+        if (code === 200) {
+          renderList()
+        }
+      }
+
+      async function removeProduct (e) {
+        const tar = e.target
+        const role = tar.dataset.role
+        if (role !== 'DELETE') return
+
+        const id = tar.dataset.id
+        const { code } = await fetch('http://localhost:3000/product/deleteProduct', {
+          method: 'POST',
+          body: JSON.stringify({ id }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(res => res.json())
+
+        if (code === 200) {
+          renderList()
+        }
+      }
+    })(document)
+  </script>
+</body>
+</html>
