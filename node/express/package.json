@@ -6,13 +6,15 @@
   "scripts": {
     "start:base": "nodemon base-demo/app",
     "start:router": "nodemon router-demo/app",
-    "start:pug": "nodemon pug-demo/app"
+    "start:pug": "nodemon pug-demo/app",
+    "start:ejs": "nodemon ejs-demo/app"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.1",
+    "ejs": "^3.1.8",
     "express": "^4.18.2",
     "pug": "^3.0.2"
   }
