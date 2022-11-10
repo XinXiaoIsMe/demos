@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="module">
+    import { render } from './index.js'
+
+    const container = document.getElementById('app')
+
+    render({
+      type: 'div',
+      props: {
+        class: {
+          test: true,
+          a: false
+        },
+        style: 'color: red;background-color: green'
+      },
+      children: [
+        { type: 'p', children: '1', props: { class: ['a', { b: true }, { c: false }] } },
+        { type: 'p', children: '2', props: { style: { color: 'green', backgroundColor: 'pink' } } },
+        { type: 'p', children: [
+          { type: 'input', props: { value: 1, type: 'text' } },
+          { type: 'button', props: { disabled: '' }, children: 'Test' }
+        ] }
+      ]
+    }, container)
+
+    // setTimeout(() => render(null, container), 2000)
+  </script>
+</body>
+</html>
