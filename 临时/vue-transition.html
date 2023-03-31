@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        p {
+            height: 30px;
+            background-color: pink;
+        }
+
+        .v-enter-active {
+            animation: bounce-in 0.5s;
+        }
+
+        .v-leave-active {
+            animation: bounce-in 0.5s reverse;
+        }
+
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.25);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* .v-enter-active,
+        .v-leave-active {
+            transition: opacity 1s ease;
+        }
+
+        .v-enter-from,
+        .v-leave-to {
+            opacity: 0;
+        }
+
+        .v-leave-from {
+            opacity: .5;
+        } */
+    </style>
+</head>
+<body>
+    <div>
+        <p></p>
+    </div>
+    <button>Click</button>
+    <!-- 模拟 vue 的 transition 组件 -->
+    <script>
+        const oDiv = document.getElementsByTagName('div')[0]
+        const oBtn = document.getElementsByTagName('button')[0]
+        let show = true
+        
+        oBtn.onclick = () => {
+            if (show) {
+                show = false
+                const oP = oDiv.getElementsByTagName('p')[0]
+                // leave(oP, () => oP.remove())
+                leave(oP, () => oP.style.display = 'none')
+                return
+            }
+
+            show = true
+            // const oP = document.createElement('p')
+            // enter(oP, () => oDiv.appendChild(oP))
+            const oP = oDiv.getElementsByTagName('p')[0]
+            enter(oP, () => oP.style.display = 'block')
+        }
+    
+        function enter (el, cb) {
+            const removeClass = () => {
+                el.classList.remove('v-enter-active')
+                el.classList.remove('v-enter-to')
+            }
+
+            el.classList.add('v-enter-from')
+            el.classList.add('v-enter-active')
+            cb()
+
+            el.ontransitionend = () => {
+                removeClass()
+                el.ontransitionend = null
+            }
+
+            el.onanimationend = () => {
+                removeClass()
+                el.onanimationend = null
+            }
+            el.offsetHeight
+            el.classList.remove('v-enter-from')
+            el.classList.add('v-enter-to')
+        }
+
+        function leave (el, cb) {
+            const removeClass = () => {
+                el.classList.remove('v-leave-to')
+                el.classList.remove('v-leave-active')
+            }
+
+            el.classList.add('v-leave-from')
+            el.classList.add('v-leave-active')
+            el.offsetHeight
+            el.classList.add('v-leave-to')
+            el.classList.remove('v-leave-from')
+
+            el.ontransitionend = () => {
+                removeClass()
+                el.ontransitionend = null
+                cb()
+            }
+            
+            el.onanimationend = () => {
+                removeClass()
+                el.onanimationend = null
+                cb()
+            }
+        }
+    </script>
+</body>
+</html>
