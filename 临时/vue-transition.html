@@ -11,7 +11,7 @@
             background-color: pink;
         }
 
-        .v-enter-active {
+        /* .v-enter-active {
             animation: bounce-in 0.5s;
         }
 
@@ -29,9 +29,9 @@
             100% {
                 transform: scale(1);
             }
-        }
+        } */
 
-        /* .v-enter-active,
+        .v-enter-active,
         .v-leave-active {
             transition: opacity 1s ease;
         }
@@ -43,7 +43,11 @@
 
         .v-leave-from {
             opacity: .5;
-        } */
+        }
+
+        ul, ol {
+            transition: all 1s;
+        }
     </style>
 </head>
 <body>
@@ -51,7 +55,161 @@
         <p></p>
     </div>
     <button>Click</button>
+    <hr>
+    <div class="container"></div>
+    <button class="toggle">TOGGLE</button>
+    <hr>
+    <ol>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+    </ol>
+    <button class="toggle-display">TOGGLE DISPLAY</button>
     <!-- 模拟 vue 的 transition 组件 -->
+    <script>
+        // el为元素，cb为用户操作，等同于v-show或者v-if的切换
+        function enter (el, cb) {
+            // 插入元素前
+            el.classList.add('v-enter-from')
+            el.classList.add('v-enter-active')
+
+            const removeClass = () => {
+                el.classList.remove('v-enter-active')
+                el.classList.remove('v-enter-to')
+            }
+
+            const eventType = 'on' + getAnimationType(el) + 'end'
+        
+            // 添加过渡结束和动画结束的事件
+            el[eventType] = function () {
+                // 移除类
+                removeClass()
+                // 移除事件
+                el[eventType] = null
+            }
+            
+            // 插入元素
+            cb()
+            // 一帧后
+            nextFrame(() => {
+                el.classList.add('v-enter-to')
+                el.classList.remove('v-enter-from')
+            })
+        }
+
+        function leave (el, cb) {
+            // 触发动画时
+            el.classList.add('v-leave-from')
+            el.classList.add('v-leave-active')
+
+            const removeClass = () => {
+                el.classList.remove('v-leave-active')
+                el.classList.remove('v-leave-to')
+            }
+
+            const eventType = 'on' + getAnimationType(el) + 'end'
+
+            el[eventType] = function () {
+                // 移除类
+                removeClass()
+                // 移除元素
+                cb()
+                el[eventType] = null
+            }
+
+            nextFrame(() => {
+                el.classList.add('v-leave-to')
+                el.classList.remove('v-leave-from')
+            })
+        }
+
+        // 利用 requestAnimationFrame 实现一帧的延迟
+        function nextFrame (cb) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(cb)
+            })
+        }
+
+        // 获取动画信息：是transition还是animation
+        function getAnimationType (el) {
+            const style = window.getComputedStyle(el)
+            const transitionDuration = parseInt(style.transitionDuration)
+            const transitionDelay = parseInt(style.transitionDelay)
+            const animationDuration = parseInt(style.animationDuration)
+            const animationDelay = parseInt(style.animationDelay)
+
+            return (transitionDuration + transitionDelay) > (animationDuration + animationDelay) ? 'transition' : 'animation'
+        }
+    </script>
+    <script>
+        function JSEnter (el, cb, options) {
+            const {
+                onBeforeEnter,
+                onEnter,
+                onAfterEnter
+            } = options
+
+            const done = () => {
+                onAfterEnter && onAfterEnter(el)
+            }
+
+            const isUserControl = userWantsControl(onEnter)
+
+            if (!isUserControl) {
+                const eventType = 'on' + getAnimationType(el) + 'end'
+            
+                // 添加过渡结束和动画结束的事件
+                el[eventType] = function () {
+                    done()
+                    // 移除事件
+                    el[eventType] = null
+                }
+            }
+
+            onBeforeEnter && onBeforeEnter(el)
+            cb() // 插入元素
+            nextFrame(() => {
+                // 元素插入后的下一帧执行onEnter
+                onEnter && onEnter(el, done)
+            })
+        }
+
+        function JSLeave (el, cb, options) {
+            const {
+                onBeforeLeave,
+                onLeave,
+                onAfterLeave
+            } = options
+
+            const done = () => {
+                cb()
+                onAfterLeave && onAfterLeave(el)
+            }
+
+            onBeforeLeave && onBeforeLeave(el)
+            onLeave && onLeave(el, done)
+
+            const isUserControl = userWantsControl(onLeave)
+
+            if (!isUserControl) {
+                const eventType = 'on' + getAnimationType(el) + 'end'
+            
+                // 添加过渡结束和动画结束的事件，这里做简单处理
+                el[eventType] = function () {
+                    done()
+                    // 移除事件
+                    el[eventType] = null
+                }
+            }
+        }
+
+        // 判断是否用户控制done
+        function userWantsControl (fn) {
+            // 判断函数的参数个数是否大于1
+            return fn.length > 1
+        }
+    </script>
+    <!-- 应用 -->
     <script>
         const oDiv = document.getElementsByTagName('div')[0]
         const oBtn = document.getElementsByTagName('button')[0]
@@ -61,65 +219,132 @@
             if (show) {
                 show = false
                 const oP = oDiv.getElementsByTagName('p')[0]
-                // leave(oP, () => oP.remove())
-                leave(oP, () => oP.style.display = 'none')
+                leave(oP, () => oP.remove())
+                // leave(oP, () => oP.style.display = 'none')
                 return
             }
 
             show = true
-            // const oP = document.createElement('p')
-            // enter(oP, () => oDiv.appendChild(oP))
-            const oP = oDiv.getElementsByTagName('p')[0]
-            enter(oP, () => oP.style.display = 'block')
+            const oP = document.createElement('p')
+            enter(oP, () => oDiv.appendChild(oP))
+            // const oP = oDiv.getElementsByTagName('p')[0]
+            // enter(oP, () => oP.style.display = 'block')
+        }
+    </script>
+    <script>
+        const oContainer = document.querySelector('.container')
+        const oOl = document.querySelector('ol')
+        const oToggleBtn = document.querySelector('.toggle')
+        const oToggleDisplayBtn = document.querySelector('.toggle-display')
+        let hidden = true
+        let displayShow = true
+
+        const createUl = () => {
+            const oUl = document.createElement('ul')
+            oUl.innerHTML = `
+                <li>第一行</li>
+                <li>第二行</li>
+                <li>第三行</li>
+            `
+            return oUl
+        }
+
+        const removeUl = () => {
+            const oUl = oContainer.querySelector('ul')
+            oUl.remove()
+            return oUl
+        }
+
+        const leaveHooks = {
+            onBeforeLeave (el) {
+                if (!el.dataset) el.dataset = {}
+                el.dataset.oldPaddingTop = el.style.paddingTop
+                el.dataset.oldPaddingBottom = el.style.paddingBottom
+                el.dataset.oldOverflow = el.style.overflow
+
+                el.style.maxHeight = `${el.scrollHeight}px`
+                el.style.overflow = 'hidden'
+            },
+            onLeave (el) {
+                if (el.scrollHeight !== 0) {
+                    el.style.maxHeight = 0
+                    el.style.paddingTop = 0
+                    el.style.paddingBottom = 0
+                }
+            },
+            onAfterLeave (el) {
+                el.style.maxHeight = ''
+                el.style.overflow = el.dataset.oldOverflow
+                el.style.paddingTop = el.dataset.oldPaddingTop
+                el.style.paddingBottom = el.dataset.oldPaddingBottom
+            }
+        }
+
+        const enterHooks = {
+            onBeforeEnter (el) {
+                if (!el.dataset) el.dataset = {}
+
+                el.dataset.oldPaddingTop = el.style.paddingTop
+                el.dataset.oldPaddingBottom = el.style.paddingBottom
+
+                el.style.maxHeight = 0
+                el.style.paddingTop = 0
+                el.style.paddingBottom = 0
+            },
+            onEnter (el) {
+                el.dataset.oldOverflow = el.style.overflow
+                if (el.scrollHeight !== 0) {
+                    el.style.maxHeight = `${el.scrollHeight}px`
+                    el.style.paddingTop = el.dataset.oldPaddingTop
+                    el.style.paddingBottom = el.dataset.oldPaddingBottom
+                } else {
+                    el.style.maxHeight = 0
+                    el.style.paddingTop = el.dataset.oldPaddingTop
+                    el.style.paddingBottom = el.dataset.oldPaddingBottom
+                }
+
+                el.style.overflow = 'hidden'
+            },
+            onAfterEnter (el) {
+                el.style.maxHeight = ''
+                el.style.overflow = el.dataset.oldOverflow
+            }
+        }
+
+        oToggleBtn.onclick = () => {
+            hidden = !hidden
+            const oUl = hidden ? oContainer.querySelector('ul') : createUl()
+
+            if (hidden) {
+                // 离开动画
+                JSLeave(
+                    oUl,
+                    removeUl,
+                    leaveHooks
+                )
+            } else {
+                // 进入动画
+                JSEnter(
+                    oUl,
+                    () => oContainer.appendChild(oUl),
+                    enterHooks
+                )
+            }
         }
     
-        function enter (el, cb) {
-            const removeClass = () => {
-                el.classList.remove('v-enter-active')
-                el.classList.remove('v-enter-to')
-            }
-
-            el.classList.add('v-enter-from')
-            el.classList.add('v-enter-active')
-            cb()
-
-            el.ontransitionend = () => {
-                removeClass()
-                el.ontransitionend = null
-            }
-
-            el.onanimationend = () => {
-                removeClass()
-                el.onanimationend = null
-            }
-            el.offsetHeight
-            el.classList.remove('v-enter-from')
-            el.classList.add('v-enter-to')
-        }
-
-        function leave (el, cb) {
-            const removeClass = () => {
-                el.classList.remove('v-leave-to')
-                el.classList.remove('v-leave-active')
-            }
-
-            el.classList.add('v-leave-from')
-            el.classList.add('v-leave-active')
-            el.offsetHeight
-            el.classList.add('v-leave-to')
-            el.classList.remove('v-leave-from')
-
-            el.ontransitionend = () => {
-                removeClass()
-                el.ontransitionend = null
-                cb()
-            }
-            
-            el.onanimationend = () => {
-                removeClass()
-                el.onanimationend = null
-                cb()
-            }
+        oToggleDisplayBtn.onclick = () => {
+            displayShow = !displayShow
+            displayShow
+            ? JSEnter(
+                oOl,
+                () => oOl.style.display = 'block',
+                enterHooks
+            )
+            : JSLeave(
+                oOl,
+                () => oOl.style.display = 'none',
+                leaveHooks
+            )
         }
     </script>
 </body>
