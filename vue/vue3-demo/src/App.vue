@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import CollapseTransition from './components/CollapseTransition.vue';
 
 const data = ref([
   {
@@ -78,6 +79,8 @@ const data = ref([
     ]
   }
 ])
+
+const show = ref(false)
 </script>
 
 <template>
@@ -86,9 +89,20 @@ const data = ref([
       :data="data"
       right-title="已选择机型"
     />
+    <Condition />
+    <CollapseTransition>
+      <ul v-if="show">
+        <li>1</li>
+        <li>1</li>
+        <li>1</li>
+      </ul>
+    </CollapseTransition>
+    <button @click="() => show = !show">TOGGLE</button>
   </div>
 </template>
 
 <style scoped>
-
+ul {
+  transition: all 1s;
+}
 </style>

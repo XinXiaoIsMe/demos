@@ -1,11 +1,14 @@
 import Transfer from './Transfer/Transfer'
+import Condition from './Condition'
 
 const components = {
-  Transfer
+  Transfer,
+  Condition
 }
 
 export {
-  Transfer
+  Transfer,
+  Condition
 }
 
 export default {

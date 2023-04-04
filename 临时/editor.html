@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor</title>
+  <style>
+    #editor {
+      width: 400px;
+      height: 300px;
+      border: 1px solid #ccc;
+      outline: none;
+      text-indent: 1em;
+    }
+
+    .dialog {
+      display: none;
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      background-color: #fff;
+      border: 1px solid #000;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <button class="add-btn">ADD</button>
+  <div contenteditable="true" id="editor">
+    <span style="color: pink;" contenteditable="false">99</span>
+  </div>
+  <div class="dialog">
+    <input class="dialog-input" type="text" />
+    <button class="close-btn">CLOSE</button>
+    <button class="confirm-add-btn">CONFIRM ADD</button>
+  </div>
+  <script>
+    const oEditor = document.getElementById('editor')
+    const oAddBtn = document.getElementsByClassName('add-btn')[0]
+    const oDialog = document.getElementsByClassName('dialog')[0]
+    const oCloseBtn = oDialog.getElementsByClassName('close-btn')[0]
+    const oConfirmBtn = oDialog.getElementsByClassName('confirm-add-btn')[0]
+    const oDialogInput = oDialog.getElementsByClassName('dialog-input')[0]
+    let currentOffset = 0
+    let currentContainer = null
+
+    oEditor.focus()
+
+    oAddBtn.addEventListener('click', handleAdd)
+    oCloseBtn.addEventListener('click', handleClose)
+    oConfirmBtn.addEventListener('click', handleConfirmAdd)
+
+    oEditor.addEventListener('click', e => {
+      const tar = e.target
+
+    })
+
+    function handleAdd () {
+      const range = window.getSelection().getRangeAt(0)
+      currentOffset = range.endOffset
+      currentContainer = range.endContainer
+      console.log(range, range.endOffset, oEditor.childNodes[range.endOffset - 1])
+
+      oDialog.style.display = 'block'
+      oDialogInput.focus()
+    }
+
+    function handleClose () {
+      oDialog.style.display = 'none'
+      oDialogInput.value = ''
+    }
+
+    function handleConfirmAdd () {
+      const value = oDialogInput.value.trim()
+      if (!value) return handleClose()
+
+      insertNode(value)
+      handleClose()
+      oEditor.focus()
+      // moveCursor(3)
+    }
+
+    function insertNode (value) {
+      const node = `<span style="color: red;">${ value }</span>`
+      console.log(node);
+    }
+
+    function moveCursor (step) {
+      const range = window.getSelection().getRangeAt(0);
+      console.log(range)
+      // 光标位置移动step个字符
+      range.setEnd(range.endContainer, range.endOffset + step);
+      range.setStart(range.endContainer, range.endOffset);
+    }
+  </script>
+</body>
+</html>
