@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pre compiler</title>
+</head>
+<body>
+  <script>
+    // 为了简单，函数内部所有表达式都不换行
+    function preCompiler (fn) {
+      const fnInfo = fn.toString().split(/\n/)
+      const paramInfo = getParamInfo(fnInfo[0])
+      const bodyInfo = getBodyInfo(fnInfo.slice(1, -1))
+      const ao = {}
+
+      return function (...args) {
+        log('预编译开始...')
+        logAO(ao)
+        if (paramInfo.length) {
+          log('将形参放入AO')
+          logVar(paramInfo, '参数')
+          paramInfo.forEach(param => {
+            ao[param.name] = undefined
+          })
+          logAO(ao)
+        }
+      
+        if (bodyInfo.length) {
+          log('解析函数体里面的变量')
+          const vars = bodyInfo.filter(item => item.type === 'var')
+          const fns = bodyInfo.filter(item => item.type === 'function')
+          logVar(vars, '变量')
+          vars.forEach(variable => ao[variable.name] = undefined)
+          logAO(ao)
+          log('实参赋值给形参')
+          paramInfo.forEach((param, i) => {
+            logAssigment(param.name, args[i])
+            ao[param.name] = args[i]
+          })
+          logAO(ao)
+          log('函数声明')
+          logVar(fns, '函数')
+          fns.forEach(fn => {
+            const { name, value } = fn
+            const params = getParamInfo(value).map(item => item.name)
+            const fnValue = new Function(...params, value.match(/\{(.*)\}/)[1])
+            ao[name] = fnValue
+            logAssigment(name, value)
+          })
+          logAO(ao)
+        }
+        log('预编译结束, 开始执行函数体')
+        fn(...args)
+      }
+    }
+
+    function getFunctionName (fnStr) {
+      const reg = /function\s*([^(]*)\(/
+      const [, name = 'anonymous'] = fnStr.match(reg)
+      return name.trim()
+    }
+
+    function getVariableName (varStr) {
+      return varStr.split(/\s?=\s?/)[0].replace(/var\s+/, '')
+    }
+
+    function getParamInfo (fnHeadStr) {
+      const reg = /function[^(]+\((.*)\)/
+      const params = fnHeadStr.match(reg)[1]?.split(',').map(item => item.trim()).filter(Boolean).map(item => {
+        const [ name, defaultValue ] = item.split(/\s?=\s?/)
+        return {
+          name,
+          defaultValue
+        }
+      })
+
+      return params
+    }
+
+    function getBodyInfo (fnBodyArray) {
+      const bodyInfo = []
+      fnBodyArray.forEach(item => {
+        item = item.trim()
+        const type = item.startsWith('var')
+          ? 'var'
+          : item.startsWith('function')
+            ? 'function'
+            : 'others'
+
+        if (type === 'others') return
+          
+        let name, value
+        if (type === 'var') {
+          name = getVariableName(item)
+        } else if (type === 'function') {
+          name = getFunctionName(item)
+          value = item
+        }
+
+        bodyInfo.push({
+          type,
+          name,
+          value
+        })
+      })
+
+      return bodyInfo
+    }
+
+    function log (msg) {
+      console.info(`%c[预编译]：%c${ msg }`, 'color: orange', 'color: #333')
+    }
+
+    function logAO (ao) {
+      const _ao = { ...ao }
+      console.log('AO: ', _ao)
+      console.table(_ao)
+    }
+
+    function logVar (varList, type) {
+      console.log(`${ type }: [ ${ varList.map(item => item.name).join(', ') } ]`)
+    }
+
+    function logAssigment (variable, value) {
+      console.log(`${ variable } => ${ JSON.stringify(value) }`)
+    }
+
+    function fn (a, b) {
+      var a = 3
+      var b = function () {}
+      function c (msg) {}
+      console.log(a, b, c)
+    }
+
+    console.log('函数源码: \n', fn.toString())
+    console.log('函数调用:', 'fn(1, 2)')
+    const wrapFn = preCompiler(fn)
+    wrapFn(1, 2)
+  </script>
+</body>
+</html>
