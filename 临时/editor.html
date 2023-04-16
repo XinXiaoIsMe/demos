@@ -6,95 +6,198 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editor</title>
   <style>
-    #editor {
+    .editor {
       width: 400px;
       height: 300px;
       border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
       outline: none;
-      text-indent: 1em;
+      font-size: 14px;
+    }
+
+    .editor:focus {
+      border-color: orange;
     }
 
     .dialog {
       display: none;
       position: fixed;
-      top: 100px;
+      top: 30vh;
       left: 50%;
       transform: translateX(-50%);
-      width: 400px;
+      width: 200px;
+      box-shadow: 0px 0px 10px 3px #ccc;
       background-color: #fff;
-      border: 1px solid #000;
-      text-align: center;
-      padding: 10px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .head {
+      padding: 5px 10px;
+      background-color: orange;
+      color: #fff;
+    }
+
+    .list {
+      padding: 4px;
+    }
+
+    .list-item {
+      display: flex;
+    }
+
+    p {
+      padding: 5px 0;
+      margin: 0;
+    }
+
+    .btn-groups {
+      padding: 0 0 8px 8px;
     }
   </style>
 </head>
 <body>
-  <button class="add-btn">ADD</button>
-  <div contenteditable="true" id="editor">
-    <span style="color: pink;" contenteditable="false">99</span>
+  <p>实现一个简易的编辑操作，主要解决插入DOM后光标错乱问题</p>
+  <div class="editor" contenteditable></div>
+  <div>
+    <button class="add-dom">添加DOM</button>
   </div>
   <div class="dialog">
-    <input class="dialog-input" type="text" />
-    <button class="close-btn">CLOSE</button>
-    <button class="confirm-add-btn">CONFIRM ADD</button>
+    <div class="head">添加DOM</div>
+    <div class="list">
+      <div class="list-item">
+        <input type="checkbox" />
+        <p>语文</p>
+      </div>
+      <div class="list-item">
+        <input type="checkbox" />
+        <p>数学</p>
+      </div>
+      <div class="list-item">
+        <input type="checkbox" />
+        <p>英语</p>
+      </div>
+    </div>
+    <div class="btn-groups">
+      <button class="cancel-btn">取消</button>
+      <button class="confirm-btn">确定</button>
+    </div>
   </div>
+
   <script>
-    const oEditor = document.getElementById('editor')
-    const oAddBtn = document.getElementsByClassName('add-btn')[0]
-    const oDialog = document.getElementsByClassName('dialog')[0]
-    const oCloseBtn = oDialog.getElementsByClassName('close-btn')[0]
-    const oConfirmBtn = oDialog.getElementsByClassName('confirm-add-btn')[0]
-    const oDialogInput = oDialog.getElementsByClassName('dialog-input')[0]
-    let currentOffset = 0
-    let currentContainer = null
+    const oEditor = document.querySelector('.editor')
+    const oAddDOMBtn = document.querySelector('.add-dom')
+    const oDialog = document.querySelector('.dialog')
+    const oCancelBtn = oDialog.querySelector('.cancel-btn')
+    const oConfirmBtn = oDialog.querySelector('.confirm-btn')
+    const oCheckboxs = oDialog.querySelectorAll('input')
+    let texts = []
 
-    oEditor.focus()
+    oAddDOMBtn.addEventListener('click', showDialog)
+    oCancelBtn.addEventListener('click', handleCancel)
+    oConfirmBtn.addEventListener('click', handleConfirm)
+    oCheckboxs.forEach(oCheckbox => oCheckbox.addEventListener('click', handleChecked))
 
-    oAddBtn.addEventListener('click', handleAdd)
-    oCloseBtn.addEventListener('click', handleClose)
-    oConfirmBtn.addEventListener('click', handleConfirmAdd)
-
-    oEditor.addEventListener('click', e => {
-      const tar = e.target
-
-    })
-
-    function handleAdd () {
-      const range = window.getSelection().getRangeAt(0)
-      currentOffset = range.endOffset
-      currentContainer = range.endContainer
-      console.log(range, range.endOffset, oEditor.childNodes[range.endOffset - 1])
-
+    function showDialog () {
       oDialog.style.display = 'block'
-      oDialogInput.focus()
     }
 
-    function handleClose () {
+    function resetDialog () {
       oDialog.style.display = 'none'
-      oDialogInput.value = ''
+      ;[ ...oDialog.querySelectorAll('input') ].forEach(input => input.checked = '')
     }
 
-    function handleConfirmAdd () {
-      const value = oDialogInput.value.trim()
-      if (!value) return handleClose()
+    function handleCancel () {
+      resetDialog()
+      texts = []
+    }
 
-      insertNode(value)
-      handleClose()
+    function handleConfirm () {
       oEditor.focus()
-      // moveCursor(3)
+      const doms = texts.map(createDOM)
+      doms.forEach(dom => insertDOM(dom))
+      resetDialog()
+      texts = []
     }
 
-    function insertNode (value) {
-      const node = `<span style="color: red;">${ value }</span>`
-      console.log(node);
+    function handleChecked () {
+      const oListItem = this.parentNode
+      const oP = oListItem.querySelector('p')
+      const text = oP.innerText
+      const isChecked = !!this.checked
+
+      isChecked ? texts.push(text) : (texts = texts.filter(t => t !== text))
     }
 
-    function moveCursor (step) {
-      const range = window.getSelection().getRangeAt(0);
-      console.log(range)
-      // 光标位置移动step个字符
-      range.setEnd(range.endContainer, range.endOffset + step);
-      range.setStart(range.endContainer, range.endOffset);
+    function createDOM (text) {
+      const oSpan = document.createElement('span')
+      oSpan.style.color = 'red'
+      oSpan.innerText = text
+      oSpan.setAttribute('contenteditable', 'false')
+      return oSpan
+    }
+
+    function insertDOM (dom) {
+      const selection = window.getSelection()
+      const range = selection.getRangeAt(0)
+
+      if (!range) return
+
+      range.insertNode(dom)
+
+      // 解决插入DOM后光标错乱问题
+      // 1. 格式化内容，使DOM平铺，去掉多余的div使用br代替，注意此时范围的起始点在内容开头
+      // 2. 重新设置selection的范围，将范围的终点设置为插入的DOM
+      // 3. 重新设置光标，将光标设置为选区结尾
+
+      formatEditor(range)
+      collectCursor(dom)
+    }
+
+    function createDOMTypeJudgeFn (type) {
+      const domType = type.toLowerCase()
+
+      return function (dom) {
+        return dom && dom.nodeType === 1 && dom.tagName.toLowerCase() === domType
+      }
+    }
+
+    const isDiv = createDOMTypeJudgeFn('div')
+    const isBr = createDOMTypeJudgeFn('br')
+
+    function formatEditor (range) {
+      const frag = document.createDocumentFragment()
+      range.selectNodeContents(oEditor)
+      const oldFrag = range.extractContents()
+      const childNodes = [ ...oldFrag.childNodes ]
+      let child
+
+      for (let i = 0; i < childNodes.length; i ++) {
+        child = childNodes[i]
+        if (isDiv(child)) {
+          const oBr = document.createElement('br')
+          const oSpan = document.createElement('span')
+          frag.appendChild(oBr)
+          frag.appendChild(oSpan) // 新增一个span，解决在一行开头插入dom后，无法将光标放置在一行开头的问题
+          ;[ ...child.childNodes ].forEach(node => {
+            if (isBr(node)) return
+            frag.appendChild(node)
+          })
+          continue
+        }
+        frag.appendChild(child)
+      }
+
+      oEditor.appendChild(frag)
+    }
+
+    function collectCursor (node) {
+      const selection = window.getSelection()
+      const childNodes = [ ...oEditor.childNodes ]
+      const index = childNodes.findIndex(child => child === node)
+      selection.extend(oEditor, index + 1) // 修改范围的终点
+      selection.collapseToEnd() // 移动光标到选区结尾
     }
   </script>
 </body>
