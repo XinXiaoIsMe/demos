@@ -1,0 +1,37 @@
+.todo-list {
+  padding: 10px;
+}
+
+.todo-head {
+  display: flex;
+  align-items: center;
+}
+
+.todo-add-btn {
+  margin-left: 10px;
+}
+
+.todo-body {
+  margin-top: 10px;
+}
+
+.todo-list-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.todo-list-content {
+  flex: 1;
+  height: 38px;
+  line-height: 38px;
+  padding-left: 10px;
+}
+
+.todo-list-content.completed span {
+  text-decoration: line-through;
+}
+
+.empty-tip {
+  text-align: center;
+}
