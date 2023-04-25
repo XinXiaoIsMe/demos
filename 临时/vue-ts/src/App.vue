@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { Tabs, TabPane } from './components/tabs'
+import type { TabInfo } from './components/tabs/types'
 import ConditionTree from './components/condition-tree/index.vue'
 import { ConditionData, ConditionOptions } from './components/condition-tree/types';
 import data from './data'
@@ -25,12 +28,31 @@ const setActiveId = () => {
   conditionTreeRef!.setActiveId(conditionTreeRef!.store.$data.childNodes[0].id)
 }
 console.log(conditionData)
+
+const activeTab = ref('name')
+const show = ref(true)
+const handleTabChange = (tab: TabInfo) => {
+  console.log(tab)
+}
 </script>
 
 <template>
   <div class="app">
     <ConditionTree ref="conditionTreeRef" :data="conditionData" :options="options" :config="config" />
     <el-button @click="setActiveId">测试手动设置activeId</el-button>
+    <hr>
+    <Tabs v-model="activeTab" @change="handleTabChange">
+      <TabPane label="姓名" name="name">
+        <span>张阿三</span>
+      </TabPane>
+      <TabPane label="年龄" name="age">
+        <span>17</span>
+      </TabPane>
+      <TabPane label="爱好" name="hobby" v-if="show">
+        <span>打游戏</span>
+      </TabPane>
+    </Tabs>
+    <button @click="() => show = false">hidden</button>
   </div>
 </template>
 
