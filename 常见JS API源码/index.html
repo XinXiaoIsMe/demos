@@ -10,6 +10,7 @@
   <input type="text" />
 
   <script src="./throttle.js"></script>
+  <script src="./cloneDeep.js"></script>
   <script>
     const oInput = document.querySelector('input')
     oInput.addEventListener('input', throttle(test, 1000))
@@ -17,6 +18,43 @@
     function test () {
       console.log('input')
     }
+
+    class Person {
+      constructor (name) {
+        this.name = name;
+      }
+
+      getName () {
+        return this.name;
+      }
+    }
+
+    const obj = {
+      a: 1,
+      b: 2,
+      c: [ 3, 4 ],
+      d: {
+        e: 3,
+        f: [ {
+          g: 9
+        } ]
+      },
+      set: new Set([ 1, 2, { h: 3 }, [ 4, 5 ] ]),
+      map: new Map([ [ 1, 2 ], [ { h: 1 }, new Set([ 10 ]) ] ]),
+      weakset: new WeakSet([{ weak: 1 }]),
+      weakmap: new WeakMap([ [ { key: 'key' }, { weak: 2 } ] ]),
+      fn () {},
+      ret: /a/,
+      person: new Person('林湘')
+    }
+    obj.d.self = obj
+    obj.set.add(obj)
+
+    const _obj = cloneDeep(obj)
+    const _obj2 = cloneDeep(obj);
+    _obj.d.f[0].g = 10
+    _obj.map.set(1, 3)
+    console.log(obj, _obj, _obj2)
   </script>
 </body>
 </html>
