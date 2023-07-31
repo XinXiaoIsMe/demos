@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>委托模式</title>
+
+  <style>
+    .tab {
+      display: flex;
+      flex-direction: column;
+      width: 500px;
+      height: 300px;
+      border: 1px solid #000;
+    }
+
+    .tab-hd {
+      width: 100%;
+      display: flex;
+      background-color: #000;
+    }
+
+    .tab-hd__item {
+      padding: 10px 20px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .tab-hd__item.active {
+      background-color: #fff;
+      color: #000;
+    }
+
+    .tab-bd {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      flex: 1;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import Tab from './tab/Tab.js'
+
+    const data = [
+      {
+        id: 1,
+        name: '第一项',
+        content: '1'
+      },
+      {
+        id: 2,
+        name: '第二项',
+        content: '2'
+      },
+      {
+        id: 3,
+        name: '第三项',
+        content: '3'
+      }
+    ]
+
+    const tab = new Tab(data)
+    tab.on('change', id => {
+      console.log('当前id: ' + id)
+    })
+  </script>
+</body>
+</html>
