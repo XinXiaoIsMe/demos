@@ -1,0 +1,16 @@
+{
+  "id": "4191321",
+  "name": "demo",
+  "font_family": "iconfont",
+  "css_prefix_text": "demo-",
+  "description": "日常demo使用",
+  "glyphs": [
+    {
+      "icon_id": "900870",
+      "name": "close-2",
+      "font_class": "close2",
+      "unicode": "e6dd",
+      "unicode_decimal": 59101
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag Box</title>
+  <link rel="stylesheet" href="../../icons/iconfont.css">
+  <style>
+    body {
+      position: relative;
+      margin: 0;
+      border: 10px solid #000;
+    }
+
+    .wrap {
+      /* position: relative; */
+      height: 600px;
+      margin: 30px;
+      padding: 20px;
+      /* border: 20px solid #000; */
+      overflow: hidden;
+    }
+
+    .box {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 4px #ccc;
+    }
+
+    .box__hd {
+      height: 60px;
+      line-height: 60px;
+      background-color: green;
+      color: #fff;
+      padding-left: 10px;
+      font-size: 18px;
+      user-select: none;
+      cursor: move;
+    }
+
+    .box__close {
+      float: right;
+      margin-right: 20px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .box__bd {
+      height: 440px;
+      background-color: #fff;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="box">
+      <div class="box__hd">
+        拖拽区域
+        <i class="iconfont demo-close2 box__close"></i>
+      </div>
+      <div class="box__bd">
+        内容区域
+      </div>
+    </div>
+  </div>
+  <script type="module">
+    import Drag from './drag.js';
+
+    new Drag({
+      el: '.box',
+      dragArea: '.box__hd',
+      // container: '.wrap'
+    });
+
+    const oBox = document.querySelector('.box');
+    const oBoxClose = oBox.querySelector('.box__close');
+    oBoxClose.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      oBox.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
