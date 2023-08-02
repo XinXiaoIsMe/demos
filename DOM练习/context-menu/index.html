@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>content menu</title>
+  <link rel="stylesheet" href="./context-menu.css">
+  <style>
+    html {
+      height: 100%;
+    }
+
+    .box {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 100px;
+      height: 100px;
+      background-color: pink;
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+
+  <script type="module">
+    import Drag from '../drag-box/drag.js';
+    import ContextMenu from './context-menu.js';
+
+    new Drag({
+      el: '.box'
+    });
+
+    new ContextMenu({
+      el: '.box',
+      menus: [
+        { label: '菜单1', id: '1' },
+        { label: '菜单2', id: '2' },
+        { label: '菜单3', id: '3' },
+      ]
+    });
+  </script>
+</body>
+</html>

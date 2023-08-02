@@ -3,11 +3,11 @@ export default class Drag {
     const {
       el,
       dragArea,
-      container = document.body
+      container = document.documentElement
     } = options;
 
     this.el = Drag.getElement(el);
-    this.dragArea = Drag.getElement(dragArea);
+    this.dragArea = dragArea ? Drag.getElement(dragArea) : this.el;
     this.container = Drag.getElement(container) || document.body;
     this.init();
   }
@@ -48,7 +48,6 @@ export default class Drag {
     const maxTop = this.container.offsetHeight - this.containerBorderWidth.top - this.containerBorderWidth.bottom - this.el.offsetHeight;
     const left = Drag.clamp(e.clientX - this.x - this.containerOffsetX - this.containerBorderWidth.left, minLeft, maxLeft);
     const top = Drag.clamp(e.clientY - this.y - this.containerOffsetY - this.containerBorderWidth.top, minTop, maxTop);
-    console.log(left, e.clientX, this.x, this.containerOffsetX);
     this.el.style.left = left + 'px';
     this.el.style.top = top + 'px';
   }
