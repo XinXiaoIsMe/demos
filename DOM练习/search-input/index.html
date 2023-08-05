@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>search input</title>
+  <style>
+    .search-input__wrap {
+      position: relative;
+      width: 200px;
+      height: 30px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .search-placeholder {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      text-indent: 4px;
+      z-index: -1;
+      color: #999;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 100%;
+      outline: none;
+      border: none;
+      font-size: 18px;
+      text-indent: 3px;
+      box-sizing: border-box;
+      background-color: transparent;
+    }
+
+    .search-input:focus {
+      border-color: blue;
+    }
+
+    .search-input.placeholder {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-input__wrap">
+    <input type="text" class="search-input" />
+    <div class="search-placeholder"></div>
+  </div>
+
+  <div style="display: none;" id="J_placeholder-list">
+    [
+      "无线键盘",
+      "积木",
+      "dell台式机",
+      "微软平板",
+      "打印纸"
+    ]
+  </div>
+
+  <script>
+    ;(function (doc) {
+      const oSearchInput = doc.querySelector('.search-input');
+      const oSearchPlaceholder = doc.querySelector('.search-placeholder');
+      const state = {
+        placeholder: '',
+        value: '',
+      };
+      let placeholderList = [];
+      let t;
+      let i = 0;
+
+      const init = () => {
+        placeholderList = getPlaceholderList();
+        setPlaceholder();
+        bindEvent();
+      };
+
+      const getPlaceholderList = () => {
+        return JSON.parse(doc.getElementById('J_placeholder-list').innerHTML);
+      };
+
+      const setPlaceholder = () => {
+        updatePlaceholder();
+
+        t = setInterval(() => {
+          i = i >= placeholderList.length - 1 ? 0 : i + 1;
+          updatePlaceholder();
+        }, 2000);
+      };
+
+      const updatePlaceholder = () => {
+        state.placeholder = placeholderList[i];
+        oSearchPlaceholder.textContent = state.placeholder;
+      };
+
+      const bindEvent = () => {
+        oSearchInput.addEventListener('focus', () => {
+          oSearchPlaceholder.style.color = '#ccc';
+          clearInterval(t);
+        });
+
+        oSearchInput.addEventListener('blur', () => {
+          if (state.value === '') {
+            oSearchPlaceholder.style.color = '#999';
+            setPlaceholder();
+          }
+        });
+
+        oSearchInput.addEventListener('input', () => {
+          state.value = oSearchInput.value;
+          if (state.value === '') {
+            oSearchPlaceholder.style.display = 'flex';
+            updatePlaceholder();
+          } else {
+            oSearchPlaceholder.style.display = 'none';
+          }
+        });
+      };
+
+      init();
+    })(document);
+  </script>
+</body>
+</html>
