@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>search input</title>
+  <link rel="stylesheet" href="../../icons/iconfont.css">
+  <style>
+    .search-input__wrap {
+      position: relative;
+      width: 200px;
+      height: 30px;
+      border: 1px solid #409eff;
+      border-radius: 4px;
+    }
+
+    .search-placeholder {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      text-indent: 4px;
+      z-index: -1;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 100%;
+      outline: none;
+      border: none;
+      font-size: 18px;
+      text-indent: 3px;
+      box-sizing: border-box;
+      background-color: transparent;
+      font-size: 14px;
+      color: #606266;
+    }
+
+    .search-input:focus {
+      border-color: #409eff;
+    }
+
+    .search-input.placeholder {
+      color: #ccc;
+    }
+
+    .search-list {
+      display: none;
+      position: absolute;
+      top: 34px;
+      left: 0;
+      width: 100%;
+      border: 1px solid #409eff;
+      border-radius: 4px;
+      box-sizing: border-box;
+      background-color: #fff;
+      transition: height .5s;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .search-list__item {
+      height: 30px;
+      line-height: 30px;
+      text-indent: 4px;
+      cursor: pointer;
+      color: #606266;
+    }
+
+    .search-list__item:hover {
+      background-color: #f5f7fa;
+    }
+
+    .search-list__item.empty {
+      color: #ccc;
+      text-align: center;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .search-clear.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-input__wrap">
+    <input type="text" class="search-input" />
+    <div class="search-placeholder"></div>
+    <div class="search-list"></div>
+    <i class="iconfont demo-close2 search-clear hidden"></i>
+  </div>
+
+  <div style="display: none;" id="J_placeholder-list">
+    [
+      "无线键盘",
+      "积木",
+      "dell台式机",
+      "微软平板",
+      "打印纸"
+    ]
+  </div>
+
+  <script>
+    ;(function (doc) {
+      const oSearchInput = doc.querySelector('.search-input');
+      const oSearchPlaceholder = doc.querySelector('.search-placeholder');
+      const oSearchList = doc.querySelector('.search-list');
+      const oSearchClear = doc.querySelector('.search-clear');
+      let placeholderList = [];
+      let t;
+      let i = 0;
+      let searchListVisible = false;
+
+      const init = () => {
+        placeholderList = getPlaceholderList();
+        updateSearchList(placeholderList);
+        autoPlaceholder();
+        bindEvent();
+      };
+
+      const getPlaceholderList = () => {
+        return JSON.parse(doc.getElementById('J_placeholder-list').innerHTML);
+      };
+
+      const bindEvent = () => {
+        oSearchInput.addEventListener('focus', function () {
+          if (this.value) return;
+
+          showPlaceholder(true);
+          oSearchPlaceholder.style.color = '#ccc';
+          clearInterval(t);
+        });
+
+        oSearchInput.addEventListener('blur', function () {
+          if (this.value) return;
+
+          showPlaceholder(true);
+          oSearchPlaceholder.style.color = '#999';
+          autoPlaceholder();
+        });
+
+        oSearchInput.addEventListener('input', function () {
+          showPlaceholder(!this.value);
+          this.value ? showSearchClear() : hiddenSearchClear();
+          oSearchList.style.transition = 'none';
+          const list = placeholderList.filter(placeholder => placeholder.includes(this.value));
+          updateSearchList(list);
+          nextFrame(() => {
+            oSearchList.style.transition = 'height .5s';
+          });
+        });
+
+        oSearchInput.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const list = this.value ? placeholderList.filter(placeholder => !placeholder.includes(this.value)) : placeholderList;
+          updateSearchList(list);
+          searchListVisible ? hiddenSearchList() : showSearchList();
+        });
+
+        oSearchInput.addEventListener('mouseover', function () {
+          this.value && showSearchClear();
+        });
+
+        oSearchInput.addEventListener('mouseleave', function () {
+          hiddenSearchClear();
+        });
+
+        oSearchClear.addEventListener('mouseover', showSearchClear);
+
+        oSearchClear.addEventListener('click', function (e) {
+          e.stopPropagation();
+          oSearchInput.value = '';
+          oSearchList.style.transition = 'none';
+          updateSearchList(placeholderList);
+          nextFrame(() => {
+            oSearchList.style.transition = 'height .5s';
+          });
+          hiddenSearchClear();
+          autoPlaceholder();
+        });
+
+        oSearchList.addEventListener('transitionend', function () {
+          this.style.display = searchListVisible ? 'block' : 'none';
+        });
+
+        oSearchList.addEventListener('click', function (e) {
+          e.stopPropagation();
+
+          const { textContent, className } = e.target;
+          if (className === 'search-list__item') {
+            oSearchInput.value = textContent;
+            showPlaceholder(false);
+            clearInterval(t);
+            hiddenSearchList();
+          }
+        });
+
+        window.addEventListener('click', function (e) {
+          if (oSearchList.contains(e.target)) return;
+          hiddenSearchList();
+        });
+      };
+
+      const autoPlaceholder = () => {
+        setPlaceholder(placeholderList[i]);
+        t = setInterval(() => {
+          i = i >= placeholderList.length - 1 ? 0 : i + 1;
+          setPlaceholder(placeholderList[i]);
+        }, 2000);
+      };
+
+      const setPlaceholder = (placeholder) => {
+        oSearchPlaceholder.textContent = placeholder;
+      };
+
+      const showPlaceholder = (show) => {
+        oSearchPlaceholder.style.display = show ? 'flex' : 'none';
+      };
+
+      const updateSearchList = (list) => {
+        const children = list.map(text => `<div class="search-list__item">${ text }</div>`).join('');
+        oSearchList.innerHTML = children ? children : '<div class="search-list__item empty">无匹配数据</div>';
+        const height = [ ...oSearchList.children ].map(node => node.offsetHeight).reduce((pre, next) => pre + next, 0);
+        oSearchList.style.height = height + 'px';
+      }
+
+      const showSearchList = () => {
+        searchListVisible = true;
+        oSearchList.style.display = 'block';
+        oSearchList.style.height = '0px';
+        nextFrame(() => {
+          const height = [ ...oSearchList.children ].map(node => node.offsetHeight).reduce((pre, next) => pre + next, 0);
+          oSearchList.style.height = height + 'px';
+        });
+      };
+
+      const hiddenSearchList = () => {
+        oSearchList.style.height = '0px';
+        searchListVisible = false;
+      };
+
+      const showSearchClear = () => {
+        oSearchClear.classList.remove('hidden');
+      };
+
+      const hiddenSearchClear = () => {
+        oSearchClear.classList.add('hidden');
+      };
+
+      const nextFrame = (cb) => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(cb);
+        });
+      };
+
+      init();
+    })(document);
+  </script>
+</body>
+</html>
