@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magnify</title>
+  <style>
+    .magnify__wrap {
+      position: relative;
+      width: 512px;
+      height: 512px;
+      margin: 100px auto;
+    }
+
+    .magnify__img-wrap {
+      display: block;
+      width: 512px;
+      height: 512px;
+    }
+
+    .magnify__img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .magnify__box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      border: 1px solid pink;
+      overflow: hidden;
+      cursor: move;
+      transform: scale(1.5);
+    }
+
+    .magnify__box.hidden {
+      display: none;
+    }
+
+    .magnify__box-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 512px;
+      height: 512px;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="magnify__wrap">
+    <div class="magnify__box hidden">
+      <img src="./img/1.png" class="magnify__box-img" />
+    </div>
+    <a href="javascript:;" class="magnify__img-wrap">
+      <img src="./img/1.png" class="magnify__img" />
+    </a>
+  </div>
+
+  <script src="./index.js"></script>
+</body>
+</html>
