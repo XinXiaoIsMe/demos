@@ -1,0 +1,19 @@
+{
+  "name": "codemirror",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/codemirror": "^5.60.12",
+    "vite": "^4.5.0"
+  },
+  "dependencies": {
+    "codemirror": "5"
+  }
+}

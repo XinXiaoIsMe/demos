@@ -1,0 +1,8 @@
+#app {
+  min-height: 200px;
+}
+
+.codemirror-container {
+  width: 300px;
+  height: 200px;
+}

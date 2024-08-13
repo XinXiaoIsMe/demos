@@ -1,14 +1,19 @@
-import Transfer from './Transfer/Transfer'
-import Condition from './Condition'
+import Transfer from './Transfer/Transfer';
+import Condition from './Condition';
+import { Skeleton, SkeletonItem } from './Skeleton';
 
 const components = {
   Transfer,
-  Condition
+  Condition,
+  Skeleton,
+  SkeletonItem
 }
 
 export {
   Transfer,
-  Condition
+  Condition,
+  Skeleton,
+  SkeletonItem
 }
 
 export default {

@@ -1,0 +1,1 @@
+export const VISIBLE = Symbol('visible');
