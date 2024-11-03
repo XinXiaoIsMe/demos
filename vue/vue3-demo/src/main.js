@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import LinXiangUI from '../modules/lin-xiang-ui'
+import VxeTable from 'vxe-table'
+import 'vxe-table/lib/style.css'
 
-createApp(App).use(LinXiangUI).mount('#app')
+createApp(App).use(VxeTable).mount('#app')
